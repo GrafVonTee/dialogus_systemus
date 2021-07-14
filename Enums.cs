@@ -7,19 +7,6 @@
         Right
     }
 
-    public enum Answers
-    {
-        Greetings,
-        NiceQuest,
-        AngryQuest,
-        LonglessQuest,
-        TermQuest,
-        Byes,
-        Yes,
-        No,
-        Proposal
-    }
-
     public enum Options
     {
         Default,

@@ -77,10 +77,7 @@ namespace DialogusSystemus
                 });
 
             AdventureDiary.InitializeDiary(startOfAdventure, endOfAdventure);
-            AdventureDiary.PrintDiary();
-            AdventureDiary.OpenNote("lets_start");
-            AdventureDiary.PrintDiary();
-            AdventureDiary.OpenNote("first_fail", "end_game");
+            AdventureDiary.OpenNote("lets_start", "end_game", "first_fail");
             AdventureDiary.PrintDiary();
         }
     }
