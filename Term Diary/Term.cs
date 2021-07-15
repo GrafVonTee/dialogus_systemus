@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using TermName = System.String;
+using TermName = DialogusSystemus.Paragraph;
 
 namespace DialogusSystemus
 {
@@ -9,10 +9,17 @@ namespace DialogusSystemus
     {
         private TermName termName;
         private Tag tag;
-        private Quote[] quotes = new Quote[0];
+        private Quote[] quotes = Array.Empty<Quote>();
         private bool isOpen = false;
 
-        public Term(string newTermName, Tag newTag) { termName = newTermName; tag = newTag; }
+        public void SetTerm(string newTermName, Tag newTag)
+        {
+            SetTitle(newTermName);
+            SetTag(newTag);
+        }
+
+        public void SetTitle(string newTermTitle) { termName = new TermName(newTermTitle); }
+        public void SetTag(Tag newTag) { tag = newTag; }
 
         public void AddQuote(params Quote[] newQuotes)
         {
@@ -32,7 +39,7 @@ namespace DialogusSystemus
 
     public static class TermDiary
     {
-        private static Dictionary<string, Term> termDiary = new();
+        private static readonly Dictionary<string, Term> termDiary = new();
 
         public static void OpenTerm(string nameOfTerm) { termDiary[nameOfTerm].OpenTerm(); }
     }

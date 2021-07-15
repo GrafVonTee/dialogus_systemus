@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Identifier = System.String;
+using ChapterTitle = DialogusSystemus.Paragraph;
 
 namespace DialogusSystemus
 {
     public class Chapter
     {
-        private string title;
-        private Dictionary<Identifier, Note> notes = new();
+        private ChapterTitle title;
+        private readonly Dictionary<Identifier, Note> notes = new();
         private bool isOpen = false;
 
         public void SetChapter(string newTitle, (Identifier, Note)[] newNotes)
@@ -16,14 +16,14 @@ namespace DialogusSystemus
             SetTitle(newTitle);
             AddNotes(newNotes);
         }
-        public void SetTitle(string newTitle) { title = newTitle; }
+        public void SetTitle(string newTitle) { title = new Paragraph(newTitle); }
         public void AddNotes((Identifier Identifier, Note Content)[] newNotes)
         {
             foreach (var n in newNotes)
                 notes[n.Identifier] = n.Content;
         }
 
-        public string GetTitle() { return title; }
+        public ChapterTitle GetTitle() { return title; }
         public Note[] GetNotes()
         {
             var notesArray = new Note[notes.Values.Count];

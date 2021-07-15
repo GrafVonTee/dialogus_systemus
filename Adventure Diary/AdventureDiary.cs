@@ -6,7 +6,7 @@ namespace DialogusSystemus
 {
     public static class AdventureDiary
     {
-        private static Chapter[] diary = new Chapter[0];
+        private static Chapter[] diary = Array.Empty<Chapter>();
 
         public static void InitializeDiary(params Chapter[] chapters)
         {

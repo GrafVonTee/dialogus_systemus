@@ -24,18 +24,7 @@ namespace DialogusSystemus
             Console.WriteLine(RightAngle);
         }
 
-        private static string GetAllString(params (string, Tag)[] input)
-        {
-            string str = "";
-            foreach (var inp in input)
-            {
-                var (words, tag) = inp;
-                str += words;
-            }
-            return str;
-        }
-
-        public static void PrintAsTitle(string title, bool isDetached = true, Options opt = Options.Sectioned)
+        public static void PrintAsTitle(Paragraph title, bool isDetached = true, Options opt = Options.Sectioned)
         {
             PrintHorizontalFrameBorder();
             FrameColors.SetOption(opt);
@@ -43,7 +32,7 @@ namespace DialogusSystemus
             if (!isDetached)
                 PrintLineInFrame();
 
-            PrintLineInFrame(Alignment.Center, (title, Tag.Default));
+            Print(title, isTitle: true);
 
             if (isDetached)
             {
@@ -79,6 +68,8 @@ namespace DialogusSystemus
                         PrintHorizontalFrameBorder();
 
                     key = Console.ReadKey().Key;
+                    Console.Write('\b');
+
                     indexOfItem = MoveFocus(key, indexOfItem, indexOfLastItem);
                 }
 
@@ -99,8 +90,18 @@ namespace DialogusSystemus
                 case "DialogusSystemus.Chapter":
                     Print((Chapter)item);
                     break;
+                case "DialogusSystemus.Utterance":
+                    Print((Utterance)item);
+                    break;
+                case "DialogusSystemus.Paragraph":
+                    Print((Paragraph)item);
+                    break;
+                case "DialogusSystemus.Word[]":
+                    Print((Word[])item);
+                    break;
                 default:
-                    PrintError("Unknown Type of Items!");
+                    var err = new Paragraph("Unknown Type of Items!");
+                    PrintError(err);
                     return;
             }
         }
@@ -118,16 +119,17 @@ namespace DialogusSystemus
                     PrintTitle((Chapter)item);
                     break;
                 default:
-                    PrintError("Unknown Type of Items!");
+                    var err = new Paragraph("Unknown Type of Items!");
+                    PrintError(err);
                     return;
             }
         }
 
-        private static void PrintError(string err)
+        private static void PrintError(Paragraph err)
         {
             PrintHorizontalFrameBorder();
             FrameColors.SetOption(Options.Error);
-            PrintLineInFrame(Alignment.Left, (err, Tag.Default));
+            Print(err);
             FrameColors.UnsetOption(Options.Error);
             PrintHorizontalFrameBorder();
             Stop();
@@ -135,7 +137,8 @@ namespace DialogusSystemus
 
         private static ConsoleKey ExitFromSubmenu()
         {
-            while (Console.ReadKey().Key != ConsoleKey.Escape) ;
+            while (Console.ReadKey().Key != ConsoleKey.Escape)
+                Console.Write('\b');
             return ConsoleKey.Clear;
         }
 
@@ -169,7 +172,7 @@ namespace DialogusSystemus
             if (!note.GetOpeningStatus()) return;
 
             PrintTitle(note, isDetached: false);
-            note.GetContent().Print();
+            Print(note.GetContent());
             Console.WriteLine();
         }
         public static void Print(Term term)
@@ -179,7 +182,7 @@ namespace DialogusSystemus
             PrintTitle(term, isDetached: false);
             foreach (var q in term.GetQuotes())
             {
-                q.PrintQuote(onlyAuthor: false);
+                Print(q, onlyAuthor: false);
                 Stop();
             }
         }
@@ -189,6 +192,65 @@ namespace DialogusSystemus
 
             PrintSelectionMenu(chapter.GetNotes());
             // foreach notes
+        }
+        private static void Print(params Word[] words)
+        {
+            foreach (var w in words)
+            {
+                FrameColors.SetColor(w.Tag);
+                Console.Write(w.Content);
+            }
+        }
+        public static void Print(Quote quote, bool onlyAuthor = false)
+        {
+            if (!onlyAuthor)
+                Print(quote.GetContent());
+            else
+                PrintHorizontalFrameBorder();
+
+            Print(quote.GetAuthor(), endPar: true);
+
+            PrintHorizontalFrameBorder();
+            if (!onlyAuthor)
+                Console.WriteLine();
+        }
+        public static void Print(Paragraph paragraph, bool isTitle = false, bool endPar = false)
+        {
+            var align = (isTitle) ? Alignment.Center : Alignment.Left;
+            Word tempWord;
+            Word[] tempLines = new[] { new Word() };
+
+            foreach (var w in paragraph.Words)
+            {
+                tempWord = w;
+
+                if ((Paragraph.Join(tempLines) + w.Content).Length + 1 > FrameWidth)
+                {
+                    PrintLineInFrame(align, tempLines);
+                    tempLines = Array.Empty<Word>();
+                }
+
+                Array.Resize(ref tempLines, tempLines.Length + 1);
+                tempLines[^1] = tempWord;
+            }
+
+            if (tempLines.Length > 0)
+                PrintLineInFrame(align, tempLines);
+
+            if (!isTitle && !endPar)
+            {
+                Stop();
+                PrintLineInFrame();
+            }
+        }
+        public static void Print(Utterance utt)
+        {
+            PrintHorizontalFrameBorder();
+
+            foreach (var paragraph in utt.Paragraphs)
+                Print(paragraph, endPar: (paragraph == utt.Paragraphs[^1]) ? true : false);
+
+            PrintHorizontalFrameBorder();
         }
 
         public static void PrintTitle(Note note, bool isDetached = true)
@@ -210,55 +272,41 @@ namespace DialogusSystemus
             PrintAsTitle(chapter.GetTitle(), isDetached, Options.Chaptered);
         }
 
-        public static void PrintLineInFrame(
-            Alignment align = Alignment.Left,
-            params(string, Tag)[] input)
+        public static void PrintLineInFrame(Alignment align = Alignment.Left, params Word[] words)
         {
             Console.Write(LeftAngle);
             FrameColors.SetColor();
             Console.Write(FrameInnerSpaces);
 
-            PrintTextWithAlign(align, input);
+            PrintTextWithAlign(align, words);
 
             FrameColors.UnsetColor();
 
             Console.WriteLine(RightAngle);
         }
 
-        private static void PrintTextWithAlign(
-            Alignment align = Alignment.Left,
-            params (string, Tag)[] input)
+        private static void PrintTextWithAlign(Alignment align = Alignment.Left, params Word[] words)
         {
-            string str = GetAllString(input);
+            string str = Paragraph.Join(words);
             var spacesWidth = (str != "") ? (FrameWidth - str.Length - 1) : (FrameWidth - 1);
 
             switch (align)
             {
                 case Alignment.Left:
-                    PrintInputWords(input);
+                    Print(words);
                     PrintSpaces(spacesWidth);
                     break;
                 case Alignment.Center:
                     PrintSpaces(spacesWidth / 2);
-                    PrintInputWords(input);
+                    Print(words);
                     PrintSpaces(spacesWidth - spacesWidth / 2);
                     break;
                 case Alignment.Right:
                     PrintSpaces(spacesWidth);
-                    PrintInputWords();
+                    Print();
                     break;
                 default:
                     break;
-            }
-        }
-
-        private static void PrintInputWords(params (string, Tag)[] input)
-        {
-            foreach (var inp in input)
-            {
-                var (words, tag) = inp;
-                FrameColors.SetColor(tag);
-                Console.Write(words);
             }
         }
 

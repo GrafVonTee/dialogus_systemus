@@ -5,10 +5,11 @@ namespace DialogusSystemus
 {
     class Answer
     {
-        private Utterance text;
+        private Paragraph text;
         private Message message;
 
-        public Answer(Utterance newText, Message newMessage) {
+        public Answer(Paragraph newText, Message newMessage)
+        {
             text = newText;
             message = newMessage;
         }
@@ -16,7 +17,7 @@ namespace DialogusSystemus
 
     public class Message
     {
-        private Utterance Text;
+        private Paragraph Text;
         private Answer[] questions;
         private Term[] terms;
     }
