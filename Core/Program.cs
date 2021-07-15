@@ -6,6 +6,8 @@ namespace DialogusSystemus
     {
         static void Main()
         {
+            FrameColors.SetColor();
+
             var term = new Term();
             term.SetTitle("Painis");
             term.SetTag(Tag.Place);
@@ -81,7 +83,9 @@ namespace DialogusSystemus
             endOfAdventure.SetTitle("Outro");
 
             (string Identifier, Note Content) endGame = ("end_game", new Note());
-            endGame.Content.SetTitle("U just end The Game");
+            endGame.Content.SetTitle(""
+                + "U just end The Game" + " #eol " 
+                + "but i love sucking dick");
             endGame.Content.SetContent(
                 new Utterance()
                 {

@@ -224,10 +224,13 @@ namespace DialogusSystemus
             {
                 tempWord = w;
 
-                if ((Paragraph.Join(tempLines) + w.Content).Length + 1 > FrameWidth)
+                if (((Paragraph.Join(tempLines) + w.Content).Length + 1 > FrameWidth)
+                    || (tempWord.Content.Contains("#eol")))
                 {
                     PrintLineInFrame(align, tempLines);
                     tempLines = Array.Empty<Word>();
+                    if (tempWord.Content.Contains("#eol"))
+                        continue;
                 }
 
                 Array.Resize(ref tempLines, tempLines.Length + 1);
