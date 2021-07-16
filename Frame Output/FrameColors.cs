@@ -11,6 +11,7 @@ namespace DialogusSystemus
             { Options.Chaptered, false },
             { Options.Error, false },
             { Options.Sectioned, false },
+            { Options.Heading, false },
         };
 
         public static void ClearFrameColor() { Console.Clear(); }
@@ -54,6 +55,11 @@ namespace DialogusSystemus
             else if (options[Options.Sectioned])
             {
                 Console.BackgroundColor = ConsoleColor.DarkMagenta;
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else if (options[Options.Heading])
+            {
+                Console.BackgroundColor = ConsoleColor.Green;
                 Console.ForegroundColor = ConsoleColor.White;
             }
             else

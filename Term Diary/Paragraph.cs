@@ -5,6 +5,7 @@ namespace DialogusSystemus
     public class Paragraph
     {
         private readonly string text;
+        public Word[] Words => SplitTextToWordsInParagraph();
         public Paragraph(string newText) { text = newText; }
         private Word[] SplitTextToWordsInParagraph()
         {
@@ -16,6 +17,7 @@ namespace DialogusSystemus
             {
                 arrayOfWords[i] = new Word();
                 (arrayOfWords[i], inBlock) = ExtractWordFromBlock(someWords[i], tag, inBlock);
+                tag = (inBlock) ? arrayOfWords[i].Tag : Tag.Default ;
             }
             return arrayOfWords;
         }
@@ -63,8 +65,7 @@ namespace DialogusSystemus
         }
 
         public string AllString => Join(Words);
-
-        public Word[] Words => SplitTextToWordsInParagraph();
+        public string GetText() { return text; }
     }
 
     public class Word

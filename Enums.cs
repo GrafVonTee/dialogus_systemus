@@ -14,6 +14,7 @@
         Focused,
         Chaptered,
         Sectioned,
+        Heading
     }
     public enum Tag
     {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using TermName = DialogusSystemus.Paragraph;
 
@@ -35,12 +34,5 @@ namespace DialogusSystemus
 
         public void OpenTerm() { isOpen = true; }
         public bool GetOpeningStatus() { return isOpen; }
-    }
-
-    public static class TermDiary
-    {
-        private static readonly Dictionary<string, Term> termDiary = new();
-
-        public static void OpenTerm(string nameOfTerm) { termDiary[nameOfTerm].OpenTerm(); }
     }
 }

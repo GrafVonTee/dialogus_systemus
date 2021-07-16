@@ -20,7 +20,7 @@ namespace DialogusSystemus
         {
             if (IsDiaryEmpty()) return;
 
-            Frame.PrintSelectionMenu(diary, isChapter: true); 
+            Frame.PrintSelectionMenu(diary, new Paragraph("Adventure Diary!"), isHead: true); 
         }
 
         private static bool IsDiaryEmpty()

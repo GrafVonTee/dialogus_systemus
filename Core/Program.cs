@@ -6,42 +6,31 @@ namespace DialogusSystemus
     {
         static void Main()
         {
+            FrameColors.ClearFrameColor();
+            FrameColors.ResetOptions();
             FrameColors.SetColor();
 
+            var cat = new Category();
+            cat.SetTitle("My love Cat");
+            
             var term = new Term();
             term.SetTitle("Painis");
             term.SetTag(Tag.Place);
 
             Quote jobs = new();
-            jobs.SetQuote(
-                new Utterance()
-                {
-                    Paragraphs = new[]
-                    {
-                        new Paragraph("My pen is #nam{Jobs}.") ,
-                        new Paragraph("My Pen can #rwd{Masturbate}!") ,
-                    }
-                },
-                new Paragraph("Evgeniy Jobs")
-                );
+            jobs.SetContent("Yo, #nam{NIGGA!!!}");
+            jobs.SetAuthor("Evgeniy Jobs");
 
             Quote dude = new();
-            dude.SetQuote(
-                new Utterance()
-                {
-                    Paragraphs = new[]
-                    {
-                        new Paragraph("#nam{My dad} love #plc{basketball}") ,
-                    }
-                },
-                new Paragraph("Dude Dudda")
-                );
+            dude.SetContent("#nam{My dad} love #plc{basketball}");
+            dude.SetAuthor("Dude Dudda");
 
+            cat.AddTerm( new[] { ("painis", term) } );
             term.AddQuote(jobs, dude);
 
-            Frame.Print(term);
-            term.OpenTerm();
-            Frame.Print(term);
+            TermDiary.InitializeDiary(cat);
+            TermDiary.OpenTerm("painis");
+            TermDiary.PrintDiary();
 
             Console.Clear();
 

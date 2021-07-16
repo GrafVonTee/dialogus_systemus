@@ -42,33 +42,41 @@ namespace DialogusSystemus
             {
                 PrintLineInFrame();
                 FrameColors.UnsetOption(opt);
-
             }
         }
 
-        public static void PrintSelectionMenu(object[] items, bool isChapter = false)
+        public static void PrintSelectionMenu(object[] items, Paragraph title, bool isChapter = false, bool isHead = false)
         {
             var indexOfItem = -1;
             var indexOfLastItem = items.Length - 1;
             ConsoleKey key = ConsoleKey.Clear;
 
+            Options option; ;
+            if (isChapter) option = Options.Chaptered;
+            else if (isHead) option = Options.Heading;
+            else option = Options.Sectioned;
+
             while (key != ConsoleKey.Escape)
             {
+                FrameColors.ClearFrameColor();
+                FrameColors.ResetOptions();
+
+                PrintAsTitle(title, isDetached: false, opt: option);
+
                 if ((key == ConsoleKey.Enter) && (indexOfItem >= 0))
                 {
                     PrintWithType(items[indexOfItem]);
-                    key = (isChapter) ? ConsoleKey.Clear : ExitFromSubmenu();
+                    key = (isHead) ? ConsoleKey.Clear : ExitFromSubmenu();
                 }
                 else
                 {
                     for (var i = 0; i < items.Length; i++)
                         PrintElemOfMenu(indexOfItem == i, items[i]);
                     
-                    if (isChapter)
+                    if (isHead)
                         PrintHorizontalFrameBorder();
 
                     key = Console.ReadKey().Key;
-                    Console.Write('\b');
 
                     indexOfItem = MoveFocus(key, indexOfItem, indexOfLastItem);
                 }
@@ -83,6 +91,9 @@ namespace DialogusSystemus
             {
                 case "DialogusSystemus.Term":
                     Print((Term)item);
+                    break;
+                case "DialogusSystemus.Category":
+                    Print((Category)item);
                     break;
                 case "DialogusSystemus.Note":
                     Print((Note)item);
@@ -105,10 +116,14 @@ namespace DialogusSystemus
                     return;
             }
         }
+
         private static void PrintTitleWithType(object item)
         {
             switch (item.GetType().ToString())
             {
+                case "DialogusSystemus.Category":
+                    PrintTitle((Category)item);
+                    break;
                 case "DialogusSystemus.Term":
                     PrintTitle((Term)item);
                     break;
@@ -171,27 +186,12 @@ namespace DialogusSystemus
         {
             if (!note.GetOpeningStatus()) return;
 
+            FrameColors.ClearFrameColor();
+
             PrintTitle(note, isDetached: false);
             Print(note.GetContent());
             Console.WriteLine();
-        }
-        public static void Print(Term term)
-        {
-            if (!term.GetOpeningStatus()) return;
-
-            PrintTitle(term, isDetached: false);
-            foreach (var q in term.GetQuotes())
-            {
-                Print(q, onlyAuthor: false);
-                Stop();
-            }
-        }
-        public static void Print(Chapter chapter)
-        {
-            if (!chapter.GetOpeningStatus()) return;
-
-            PrintSelectionMenu(chapter.GetNotes());
-            // foreach notes
+            Stop();
         }
         private static void Print(params Word[] words)
         {
@@ -201,18 +201,45 @@ namespace DialogusSystemus
                 Console.Write(w.Content);
             }
         }
-        public static void Print(Quote quote, bool onlyAuthor = false)
+        public static void Print(Term term)
         {
-            if (!onlyAuthor)
-                Print(quote.GetContent());
-            else
+            if (!term.GetOpeningStatus()) return;
+
+            PrintTitle(term, isDetached: false);
+            foreach (var q in term.GetQuotes())
+            {
                 PrintHorizontalFrameBorder();
+                Print(q, onlyAuthor: false, lastQuote: true);
+                PrintHorizontalFrameBorder();
+            }
+            Stop();
+        }
+        public static void Print(Chapter chapter)
+        {
+            if (!chapter.GetOpeningStatus()) return;
 
-            Print(quote.GetAuthor(), endPar: true);
+            PrintSelectionMenu(chapter.GetNotes(), chapter.GetTitle(), isChapter: true);
+            // foreach notes
+        }
+        private static void Print(Category item)
+        {
+            if (!item.GetOpeningStatus()) return;
 
-            PrintHorizontalFrameBorder();
-            if (!onlyAuthor)
-                Console.WriteLine();
+            PrintSelectionMenu(item.GetTerms(), item.GetTitle(), isChapter: true);
+        }
+        public static void Print(Quote quote, bool onlyAuthor = false, bool lastQuote = false)
+        {
+            if (onlyAuthor)
+            {
+                PrintHorizontalFrameBorder();
+                Print(quote.GetAuthor(), endPar: true, isTitle: true);
+            }
+            else
+            {
+                Print(quote.GetContent(), endPar: true);
+                if (!lastQuote)
+                    PrintLineInFrame();
+            }
         }
         public static void Print(Paragraph paragraph, bool isTitle = false, bool endPar = false)
         {
@@ -273,6 +300,12 @@ namespace DialogusSystemus
             if (!chapter.GetOpeningStatus()) return;
 
             PrintAsTitle(chapter.GetTitle(), isDetached, Options.Chaptered);
+        }
+        private static void PrintTitle(Category cat, bool isDetached = false)
+        {
+            if (!cat.GetOpeningStatus()) return;
+
+            PrintAsTitle(cat.GetTitle(), isDetached, Options.Chaptered);
         }
 
         public static void PrintLineInFrame(Alignment align = Alignment.Left, params Word[] words)

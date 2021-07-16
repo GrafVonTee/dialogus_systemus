@@ -1,24 +1,27 @@
 ﻿using System;
 
-using Author = DialogusSystemus.Paragraph;
-using Content = DialogusSystemus.Utterance;
+using Author = System.String;
+using Content = DialogusSystemus.Paragraph;
 
 namespace DialogusSystemus
 {
     public class Quote
     {
         private Content content;
-        private Author author = new("#nam{@} author");
+        private Author author = "Dude";
 
-        public void ChangeAuthor(Author newAuthor) { author = newAuthor; }
-        public void SetContent(Content newContent) { content = newContent; }
-        public void SetQuote(Content utt, Author aut)
+        public void SetAuthor(Author newAuthor) { author = newAuthor; }
+        public void SetContent(string newContent) { content = new Paragraph(newContent); }
+        public void SetQuote(string utt, Author aut)
         {
-            ChangeAuthor(aut);
+            SetAuthor(aut);
             SetContent(utt);
         }
 
-        public Content GetContent() { return content; }
-        public Author GetAuthor() { return new Author("#nam{@} " + author.AllString); }
+        public Content GetContent()
+        {
+            return new Content("#nam{@} " + author + ": " + content.GetText());
+        }
+        public Content GetAuthor() { return new Content("#nam{@} " + author); }
     }
 }
